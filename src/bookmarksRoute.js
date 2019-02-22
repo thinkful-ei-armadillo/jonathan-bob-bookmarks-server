@@ -61,6 +61,20 @@ router.route('/bookmarks/:id')
       return bookmark.id === parseInt(req.params.id);
     });
     res.send(bookmarks); // list of specific bookmark -- 404 if invalid id
+  })
+  .delete((req, res) => {
+    const bookmarks = BOOKMARKS;
+    const { id } = req.params;
+    const bookmarkIndex = bookmarks.findIndex(b => b.id == id);
+
+    if (bookmarkIndex === -1) {
+      return res.status(404).send('Not found');
+    }
+
+    BOOKMARKS.splice(bookmarkIndex, 1);
+
+    res.status(204).end();
+
   });
 
 module.exports = router;
