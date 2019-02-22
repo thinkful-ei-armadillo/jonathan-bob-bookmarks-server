@@ -5,6 +5,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
 const winston = require('winston');
+const router = require('./bookmarksRoute');
+const bodyParser = express.json();
 
 const app = express();
 
@@ -26,14 +28,20 @@ const morganOption = (NODE_ENV === 'production')
   ? 'tiny'
   : 'common';
 
+app.use((req, res, next) => {
+  authToken = req.get('Authorization')
+  if (!authToken || (authToken.split(' ')[1] !== process.env.API_KEY)) {
+    return res.status(401).json({error: 'Unauthorized request'})
+  }
+  next()
+})
+
 app.use(morgan(morganOption));
+app.use(bodyParser);
 app.use(helmet());
 app.use(cors());
 
-app.get('/', (req,res) => {
-  res.send('Hello, boilerplate !')
-})
-'some string'
+app.use(router);
 
 app.use(function errorHandler(error, req, res, next) {
   let response;
