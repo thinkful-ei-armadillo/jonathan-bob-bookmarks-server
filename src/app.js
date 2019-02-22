@@ -1,3 +1,5 @@
+
+'use strict';
 require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
@@ -29,12 +31,12 @@ const morganOption = (NODE_ENV === 'production')
   : 'common';
 
 app.use((req, res, next) => {
-  authToken = req.get('Authorization')
+  const authToken = req.get('Authorization');
   if (!authToken || (authToken.split(' ')[1] !== process.env.API_KEY)) {
-    return res.status(401).json({error: 'Unauthorized request'})
+    return res.status(401).json({error: 'Unauthorized request'});
   }
-  next()
-})
+  next();
+});
 
 app.use(morgan(morganOption));
 app.use(bodyParser);
@@ -46,12 +48,12 @@ app.use(router);
 app.use(function errorHandler(error, req, res, next) {
   let response;
   if (NODE_ENV === 'production') {
-    response = {error: {message: 'server error'} }
+    response = {error: {message: 'server error'} };
   } else {
     console.error(error);
-    response = {message: error.message, error}
+    response = {message: error.message, error};
   }
   res.status(500).json(response);
-})
+});
 
 module.exports = app;
